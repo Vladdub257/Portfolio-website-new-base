@@ -32,6 +32,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Header scroll state
   function updateHeader() {
+    if (!header) return;
+
     if (window.scrollY > 10) {
       header.classList.add('scrolled');
     } else {
@@ -46,14 +48,21 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
     anchor.addEventListener('click', function (e) {
       var href = this.getAttribute('href');
+
       if (href === '#') return;
 
       e.preventDefault();
+
       var target = document.querySelector(href);
+
       if (target) {
-        var offset = header.offsetHeight;
+        var offset = header ? header.offsetHeight : 0;
         var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
-        window.scrollTo({ top: top, behavior: 'smooth' });
+
+        window.scrollTo({
+          top: top,
+          behavior: 'smooth'
+        });
       }
     });
   });
@@ -72,17 +81,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
   fadeGroups.forEach(function (group) {
     var elements = document.querySelectorAll(group.selector);
+
     elements.forEach(function (el, index) {
       el.classList.add('fade-in');
+
       if (group.stagger && index < 3) {
         el.classList.add('fade-in-delay-' + (index + 1));
       }
+
       fadeElements.push(el);
     });
   });
 
   function checkVisibility() {
     var trigger = window.innerHeight * 0.88;
+
     fadeElements.forEach(function (el) {
       if (el.getBoundingClientRect().top < trigger) {
         el.classList.add('visible');
@@ -102,7 +115,6 @@ document.addEventListener('DOMContentLoaded', function () {
     contactForm.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      // Collect form data
       var formData = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
@@ -111,22 +123,29 @@ document.addEventListener('DOMContentLoaded', function () {
         description: document.getElementById('description').value
       };
 
-      // Log form data for debugging (remove in production)
+      // Debug log. Remove when real backend is connected.
       console.log('Form submitted:', formData);
 
-      // Simulate form submission
-      // In production, replace this with actual form submission logic
-      // For example: fetch('/api/contact', { method: 'POST', body: JSON.stringify(formData) })
+      // Simulated success state.
+      // Replace later with real submission logic.
+      // Example:
+      // fetch('/api/contact', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(formData)
+      // })
 
-      // Show success message
       contactForm.classList.add('hidden');
+
       if (formHeader) {
         formHeader.classList.add('hidden');
       }
-      formSuccess.classList.add('visible');
 
-      // Scroll to success message
-      formSuccess.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      formSuccess.classList.add('visible');
+      formSuccess.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
     });
   }
 });
