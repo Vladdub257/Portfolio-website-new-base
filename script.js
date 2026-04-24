@@ -1,39 +1,65 @@
 /**
  * Freelance Portfolio - Vanilla JavaScript
+ * Handles mobile navigation, smooth scrolling, scroll animations, and contact form state.
  */
 
 document.addEventListener('DOMContentLoaded', function () {
+  initMobileNavigation();
+  initHeaderScrollState();
+  initSmoothScroll();
+  initFadeInAnimations();
+  initContactForm();
+});
+
+/**
+ * Mobile navigation
+ */
+function initMobileNavigation() {
   var navToggle = document.getElementById('nav-toggle');
   var navMenu = document.getElementById('nav-menu');
-  var header = document.getElementById('header');
   var navLinks = document.querySelectorAll('.nav-link');
 
-  // Mobile navigation
-  if (navToggle && navMenu) {
-    navToggle.addEventListener('click', function () {
-      navToggle.classList.toggle('active');
-      navMenu.classList.toggle('active');
-    });
+  if (!navToggle || !navMenu) return;
 
-    navLinks.forEach(function (link) {
-      link.addEventListener('click', function () {
-        navToggle.classList.remove('active');
-        navMenu.classList.remove('active');
-      });
-    });
-
-    document.addEventListener('click', function (e) {
-      if (!navToggle.contains(e.target) && !navMenu.contains(e.target)) {
-        navToggle.classList.remove('active');
-        navMenu.classList.remove('active');
-      }
-    });
+  function closeMenu() {
+    navToggle.classList.remove('active');
+    navMenu.classList.remove('active');
   }
 
-  // Header scroll state
-  function updateHeader() {
-    if (!header) return;
+  navToggle.addEventListener('click', function () {
+    navToggle.classList.toggle('active');
+    navMenu.classList.toggle('active');
+  });
 
+  navLinks.forEach(function (link) {
+    link.addEventListener('click', closeMenu);
+  });
+
+  document.addEventListener('click', function (event) {
+    var clickedInsideToggle = navToggle.contains(event.target);
+    var clickedInsideMenu = navMenu.contains(event.target);
+
+    if (!clickedInsideToggle && !clickedInsideMenu) {
+      closeMenu();
+    }
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      closeMenu();
+    }
+  });
+}
+
+/**
+ * Header scroll state
+ */
+function initHeaderScrollState() {
+  var header = document.getElementById('header');
+
+  if (!header) return;
+
+  function updateHeader() {
     if (window.scrollY > 10) {
       header.classList.add('scrolled');
     } else {
@@ -41,39 +67,49 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  window.addEventListener('scroll', updateHeader);
+  window.addEventListener('scroll', updateHeader, { passive: true });
   updateHeader();
+}
 
-  // Smooth scroll
-  document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
-    anchor.addEventListener('click', function (e) {
-      var href = this.getAttribute('href');
+/**
+ * Smooth scroll for same-page anchor links
+ */
+function initSmoothScroll() {
+  var header = document.getElementById('header');
+  var anchorLinks = document.querySelectorAll('a[href^="#"]');
 
-      if (href === '#') return;
+  anchorLinks.forEach(function (anchor) {
+    anchor.addEventListener('click', function (event) {
+      var href = anchor.getAttribute('href');
 
-      e.preventDefault();
+      if (!href || href === '#') return;
 
       var target = document.querySelector(href);
 
-      if (target) {
-        var offset = header ? header.offsetHeight : 0;
-        var top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+      if (!target) return;
 
-        window.scrollTo({
-          top: top,
-          behavior: 'smooth'
-        });
-      }
+      event.preventDefault();
+
+      var headerOffset = header ? header.offsetHeight : 0;
+      var targetTop = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: targetTop,
+        behavior: 'smooth'
+      });
     });
   });
+}
 
-  // Fade-in on scroll with staggered delays
+/**
+ * Fade-in animations on scroll
+ */
+function initFadeInAnimations() {
   var fadeGroups = [
     { selector: '.about-column', stagger: true },
     { selector: '.process-step', stagger: true },
     { selector: '.pricing', stagger: false },
     { selector: '.project', stagger: true },
-    { selector: '.contact-intro', stagger: false },
     { selector: '.contact-form-wrapper', stagger: false }
   ];
 
@@ -82,70 +118,82 @@ document.addEventListener('DOMContentLoaded', function () {
   fadeGroups.forEach(function (group) {
     var elements = document.querySelectorAll(group.selector);
 
-    elements.forEach(function (el, index) {
-      el.classList.add('fade-in');
+    elements.forEach(function (element, index) {
+      element.classList.add('fade-in');
 
       if (group.stagger && index < 3) {
-        el.classList.add('fade-in-delay-' + (index + 1));
+        element.classList.add('fade-in-delay-' + (index + 1));
       }
 
-      fadeElements.push(el);
+      fadeElements.push(element);
     });
   });
 
   function checkVisibility() {
-    var trigger = window.innerHeight * 0.88;
+    var triggerPoint = window.innerHeight * 0.88;
 
-    fadeElements.forEach(function (el) {
-      if (el.getBoundingClientRect().top < trigger) {
-        el.classList.add('visible');
+    fadeElements.forEach(function (element) {
+      if (element.getBoundingClientRect().top < triggerPoint) {
+        element.classList.add('visible');
       }
     });
   }
 
-  window.addEventListener('scroll', checkVisibility);
+  window.addEventListener('scroll', checkVisibility, { passive: true });
   checkVisibility();
+}
 
-  // Contact Form Handling
+/**
+ * Contact form handling
+ */
+function initContactForm() {
   var contactForm = document.getElementById('contact-form');
-  var formSuccess = document.getElementById('form-success');
   var formHeader = document.getElementById('form-header');
+  var formSuccess = document.getElementById('form-success');
 
-  if (contactForm && formSuccess) {
-    contactForm.addEventListener('submit', function (e) {
-      e.preventDefault();
+  if (!contactForm || !formSuccess) return;
 
-      var formData = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        projectType: document.getElementById('project-type').value,
-        budget: document.getElementById('budget').value,
-        description: document.getElementById('description').value
-      };
+  contactForm.addEventListener('submit', function (event) {
+    event.preventDefault();
 
-      // Debug log. Remove when real backend is connected.
-      console.log('Form submitted:', formData);
+    var formData = {
+      name: getInputValue('name'),
+      email: getInputValue('email'),
+      projectType: getInputValue('project-type'),
+      budget: getInputValue('budget'),
+      description: getInputValue('description')
+    };
 
-      // Simulated success state.
-      // Replace later with real submission logic.
-      // Example:
-      // fetch('/api/contact', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // })
+    // Debug log. Remove when real backend is connected.
+    console.log('Form submitted:', formData);
 
-      contactForm.classList.add('hidden');
+    // Simulated success state.
+    // Replace this later with real submission logic, for example:
+    //
+    // fetch('/api/contact', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(formData)
+    // });
 
-      if (formHeader) {
-        formHeader.classList.add('hidden');
-      }
+    contactForm.classList.add('hidden');
 
-      formSuccess.classList.add('visible');
-      formSuccess.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
+    if (formHeader) {
+      formHeader.classList.add('hidden');
+    }
+
+    formSuccess.classList.add('visible');
+    formSuccess.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
     });
-  }
-});
+  });
+}
+
+/**
+ * Safely reads a form field value by id.
+ */
+function getInputValue(id) {
+  var input = document.getElementById(id);
+  return input ? input.value.trim() : '';
+}
