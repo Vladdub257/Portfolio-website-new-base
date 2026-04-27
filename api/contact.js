@@ -139,7 +139,9 @@ module.exports = async function handler(req, res) {
 
         return res.status(500).json({
             success: false,
-            message: 'Failed to save inquiry'
+            message: error.message || 'Failed to save inquiry',
+            code: error.code || null,
+            status: error.status || null
         });
     }
 };
