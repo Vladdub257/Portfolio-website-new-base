@@ -153,8 +153,11 @@ function initContactForm() {
 
   if (!contactForm || !formSuccess) return;
 
-  contactForm.addEventListener('submit', function (event) {
+  contactForm.addEventListener('submit', async function (event) {
     event.preventDefault();
+
+    var submitButton = contactForm.querySelector('button[type="submit"]');
+    var originalButtonText = submitButton ? submitButton.textContent : '';
 
     var formData = {
       name: getInputValue('name'),
@@ -164,29 +167,46 @@ function initContactForm() {
       description: getInputValue('description')
     };
 
-    // Debug log. Remove when real backend is connected.
-    console.log('Form submitted:', formData);
+    try {
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Sending...';
+      }
 
-    // Simulated success state.
-    // Replace this later with real submission logic, for example:
-    //
-    // fetch('/api/contact', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(formData)
-    // });
+      var response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
 
-    contactForm.classList.add('hidden');
+      var result = await response.json();
 
-    if (formHeader) {
-      formHeader.classList.add('hidden');
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Form submission failed');
+      }
+
+      contactForm.classList.add('hidden');
+
+      if (formHeader) {
+        formHeader.classList.add('hidden');
+      }
+
+      formSuccess.classList.add('visible');
+      formSuccess.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
+    } catch (error) {
+      console.error('Form submission error:', error);
+      alert('Something went wrong. Please try again later.');
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = originalButtonText || 'Send Project Inquiry';
+      }
     }
-
-    formSuccess.classList.add('visible');
-    formSuccess.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center'
-    });
   });
 }
 

@@ -30,10 +30,9 @@
 
   --container: 1040px;
 
-  --header-height: 10vh;
-  --section-min-height: 100vh;
-  --section-padding-y: 7vh;
-  --section-padding-y-compact: 4vh;
+  --header-height: 7vh;
+  --section-padding-y: 9vh;
+  --section-padding-y-compact: 7vh;
   --section-gap: 5vh;
 
   --radius-sm: 3px;
@@ -99,7 +98,12 @@ textarea {
   width: 100%;
   max-width: var(--container);
   margin: 0 auto;
-  padding: 0 var(--space-md);
+}
+
+.hero .container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* .about,
@@ -137,7 +141,7 @@ textarea {
 
 .nav {
   width: 100%;
-  min-height: 7vh;
+  min-height: var(--header-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -321,9 +325,11 @@ textarea {
   position: relative;
   width: 100%;
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-top: var(--header-height);
 }
 
 .hero::after {
@@ -400,11 +406,11 @@ textarea {
 .about {
   position: relative;
   width: 100%;
-  min-height: 25vh;
+  min-height: 55vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 72px 0 72px;
+  padding: var(--section-padding-y) 0;
   background-color: var(--color-bg-warm);
 }
 
@@ -502,10 +508,11 @@ textarea {
   position: relative;
   width: 100%;
   min-height: 100vh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 72px 0 72px;
+  padding: calc(var(--header-height) + var(--section-padding-y-compact)) 0 var(--section-padding-y);
 }
 
 .process::after {
@@ -677,11 +684,10 @@ textarea {
 .work {
   position: relative;
   width: 100%;
-  min-height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 72px;
+  padding: var(--section-padding-y) 0;
   background-color: var(--color-bg-warm);
 }
 
@@ -859,11 +865,11 @@ textarea {
 .contact {
   position: relative;
   width: 100%;
-  min-height: auto;
+  min-height: 70vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 72px 0 104px;
+  padding: var(--section-padding-y) 0 calc(var(--section-padding-y) + 1vh);
 }
 
 .contact-layout {
@@ -1051,7 +1057,6 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  position: sticky;
   background-color: var(--color-bg);
   border-top: 1px solid var(--color-border);
 }
