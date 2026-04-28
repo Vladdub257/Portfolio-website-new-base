@@ -97,6 +97,7 @@ textarea {
 .container {
   width: 100%;
   max-width: var(--container);
+  padding: 0 var(--space-xl) 0 var(--space-xl);
   margin: 0 auto;
 }
 
@@ -350,6 +351,10 @@ textarea {
 
 .hero-content {
   max-width: 660px;
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  flex-direction: column;
 }
 
 .hero-label {
